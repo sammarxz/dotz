@@ -16,9 +16,10 @@ export function Button({
   ...props
 }: ButtonProps) {
   const variantClasses = {
-    default: "bg-white text-black hover:bg-zinc-200",
+    default: "bg-white text-background hover:bg-zinc-200",
     ghost: "bg-transparent text-zinc-700 hover:text-white hover:bg-zinc-900",
-    outline: "border border-zinc-900 text-zinc-700 hover:border-zinc-700 hover:text-white",
+    outline:
+      "border border-zinc-900 text-zinc-700 hover:border-zinc-700 hover:text-white",
   };
 
   const sizeClasses = {

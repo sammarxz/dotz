@@ -35,9 +35,12 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
     >
       <span
         className={cn(
-          "block w-2 h-2 rounded-full transition-all",
-          hasEntry ? "bg-white" : "bg-zinc-500",
-          isToday && "ring-2 ring-white/30 ring-offset-2 ring-offset-black"
+          "w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 cursor-pointer bg-zinc-900/50 hover:bg-zinc-800",
+          hasEntry
+            ? "bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.8)] "
+            : "bg-zinc-800",
+          isToday &&
+            "ring-2 ring-white/30 ring-offset-2 ring-offset-background animate-pulse scale-125"
         )}
       />
     </button>

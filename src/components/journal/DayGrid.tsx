@@ -16,7 +16,7 @@ export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
     <div
       className={`
         grid
-        gap-4                 
+        gap-2                 
         w-full
         grid-cols-[repeat(auto-fill,minmax(24px,1fr))]
       `}

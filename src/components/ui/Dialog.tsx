@@ -14,7 +14,7 @@ export function Dialog({ isOpen, onClose, children }: DialogProps) {
       onOpenChange={(open: boolean) => !open && onClose()}
     >
       <BaseDialog.Portal>
-        <BaseDialog.Backdrop className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+        <BaseDialog.Backdrop className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {children}
         </div>

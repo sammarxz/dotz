@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --background: hsl(0 0% 4%);
+  --foreground: hsl(0 0% 98%);
 }
 
 @theme inline {
@@ -11,8 +11,8 @@
 }
 
 body {
-  background: #000000;
-  color: #ffffff;
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: monospace;
 }
 

@@ -27,7 +27,7 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black outline-none text-white max-w-2xl">
+      <DialogContent className="bg-background outline-none text-white max-w-2xl">
         <div className="p-6 space-y-6">
           <h2 className="text-2xl font-bold">Shortcuts</h2>
 

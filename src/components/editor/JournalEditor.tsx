@@ -71,7 +71,7 @@ export function JournalEditor({
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black border border-zinc-900 text-white max-w-4xl h-[72vh] flex flex-col">
+      <DialogContent className="bg-background border border-zinc-900 text-white max-w-4xl h-[72vh] flex flex-col">
         <div className="flex-1 w-full p-4">
           <ScrollArea className="h-full">
             <Textarea
