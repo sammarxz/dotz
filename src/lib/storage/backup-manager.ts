@@ -1,16 +1,25 @@
 import { BackupData } from "../types";
-import { JournalStorage } from "./journal-storage";
+import { FileSystemStorage } from "./file-system-storage";
 import { SettingsStorage } from "./settings-storage";
 
 export class BackupManager {
   private static readonly VERSION = "1.0.0";
 
   static async createBackup(): Promise<BackupData> {
+    let entries: Record<string, any> = {};
+
+    if (FileSystemStorage.isSupported()) {
+      try {
+        entries = await FileSystemStorage.getAllEntries();
+      } catch (error) {
+        console.error("Failed to load entries from file system", error);
+      }
+    }
+
     const backup: BackupData = {
       version: this.VERSION,
       exportDate: new Date().toISOString(),
-      entries: JournalStorage.getEntries(),
-      template: JournalStorage.getTemplate(),
+      entries,
       settings: SettingsStorage.getSettings(),
     };
 
@@ -38,7 +47,7 @@ export class BackupManager {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const backup = JSON.parse(e.target?.result as string) as BackupData;
 
@@ -46,10 +55,14 @@ export class BackupManager {
             throw new Error("Invalid backup file");
           }
 
-          JournalStorage.saveEntries(backup.entries);
-          if (backup.template) {
-            JournalStorage.saveTemplate(backup.template);
+          if (FileSystemStorage.isSupported()) {
+            // Restore entries to file system
+            for (const [key, entry] of Object.entries(backup.entries)) {
+              await FileSystemStorage.saveEntry(key, entry);
+            }
           }
+
+          // Restore settings (always in localStorage)
           if (backup.settings) {
             SettingsStorage.saveSettings(backup.settings);
           }

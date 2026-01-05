@@ -20,9 +20,13 @@ export function useSettings() {
 
     // Sincroniza notificações
     if (settings.notifications.enabled) {
-      ReminderManager.scheduleDaily(settings.notifications.time);
+      ReminderManager.scheduleDaily(settings.notifications.time).catch((error) => {
+        console.error("Failed to schedule notifications:", error);
+      });
     } else {
-      ReminderManager.cancel();
+      ReminderManager.cancel().catch((error) => {
+        console.error("Failed to cancel notifications:", error);
+      });
     }
   }, [settings]);
 

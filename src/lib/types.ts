@@ -3,7 +3,7 @@ export interface JournalEntry {
   memory: string;
 }
 
-export type StorageKey = `journal-entries` | `journal-template`;
+export type StorageKey = `journal-entries`;
 
 export interface ShortcutDefinition {
   key: string;
@@ -29,6 +29,5 @@ export interface BackupData {
   version: string;
   exportDate: string;
   entries: Record<string, JournalEntry>;
-  template: string;
   settings: AppSettings;
 }

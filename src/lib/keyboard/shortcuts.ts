@@ -17,10 +17,11 @@ export const SHORTCUTS: Record<string, ShortcutDefinition> = {
     category: "settings",
     modifiers: { shift: true },
   },
-  OPEN_TEMPLATES: {
-    key: "t",
-    description: "open Templates",
+  OPEN_SETTINGS: {
+    key: ",",
+    description: "Open Settings",
     category: "settings",
+    modifiers: { meta: true },
   },
 };
 

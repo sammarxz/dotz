@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { SwitchComponent } from "@/components/ui/Switch";
@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/components/ui/Toast";
-import { BackupManager } from "@/lib/storage/backup-manager";
-import { Download, Upload, Trash2, Bell, Volume2 } from "lucide-react";
+import { useFileSystemStorage } from "@/hooks/useFileSystemStorage";
+import { FileSystemStorage } from "@/lib/storage/file-system-storage";
+import { Bell, Volume2, FolderOpen, RefreshCw } from "lucide-react";
 
 interface SettingsPageProps {
   isOpen: boolean;
@@ -19,7 +20,16 @@ interface SettingsPageProps {
 export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const { settings, updateSettings, enableNotifications } = useSettings();
   const { success, error } = useToast();
-  const [isDownloading, setIsDownloading] = useState(false);
+  const { directoryPath, setupFileSystem, isSupported } = useFileSystemStorage();
+  const [currentPath, setCurrentPath] = useState<string>("");
+  const [isChangingDirectory, setIsChangingDirectory] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const path = FileSystemStorage.getDirectoryPath();
+      setCurrentPath(path);
+    }
+  }, [isOpen, directoryPath]);
 
   const handleSoundToggle = (checked: boolean) => {
     updateSettings("soundEffects", checked);
@@ -60,41 +70,29 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
     });
   };
 
-  const handleDownloadBackup = async () => {
-    try {
-      setIsDownloading(true);
-      const backup = await BackupManager.createBackup();
-      BackupManager.downloadBackup(backup);
-      success("Backup created", "Your data has been downloaded");
-    } catch (err) {
-      error("Backup failed", "Could not create backup file");
-    } finally {
-      setIsDownloading(false);
+  const handleChangeDirectory = async () => {
+    if (!isSupported) {
+      error("Not supported", "File System Access API is not supported in your browser");
+      return;
     }
-  };
 
-  const handleRestoreBackup = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      try {
-        await BackupManager.restoreBackup(file);
-        success("Backup restored", "Your data has been restored successfully");
-        setTimeout(() => window.location.reload(), 1500);
-      } catch (err) {
-        error("Restore failed", "Could not restore backup file");
+    setIsChangingDirectory(true);
+    try {
+      const granted = await setupFileSystem();
+      if (granted) {
+        const newPath = FileSystemStorage.getDirectoryPath();
+        setCurrentPath(newPath);
+        success("Directory changed", `Files will now be saved to: ${newPath}`);
+        // Reload to refresh entries
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        error("Cancelled", "Directory selection was cancelled");
       }
-    };
-    input.click();
-  };
-
-  const handleDeleteAccount = () => {
-    // Placeholder - implementar confirmação real
-    error("Feature not available", "Account deletion is coming soon");
+    } catch (err) {
+      error("Failed", "Could not change directory");
+    } finally {
+      setIsChangingDirectory(false);
+    }
   };
 
   return (
@@ -173,89 +171,50 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
               </div>
             </section>
 
-            {/* Data Management Section */}
+            {/* Storage Management Section */}
             <section className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-1">Data Management</h3>
+                <h3 className="text-lg font-semibold mb-1">Storage</h3>
                 <p className="text-sm text-zinc-500">
-                  Backup and restore your journal
+                  Manage where your journal entries are saved
                 </p>
               </div>
 
-              <div className="space-y-3">
-                {/* Download Backup */}
-                <div className="flex items-center justify-between py-3 border-b border-zinc-900">
-                  <div className="flex items-start gap-3">
-                    <Download className="w-5 h-5 mt-0.5 text-zinc-500" />
-                    <div>
-                      <p className="text-sm font-medium">Download Backup</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
-                        Export all your entries and settings
-                      </p>
-                    </div>
+              <div className="space-y-3 py-3 border-b border-zinc-900">
+                <div className="flex items-start gap-3">
+                  <FolderOpen className="w-5 h-5 mt-0.5 text-zinc-500" />
+                  <div className="flex-1">
+                    <label className="text-sm font-medium">Storage Location</label>
+                    <p className="text-xs text-zinc-500 mt-0.5 break-all">
+                      {currentPath || "No directory selected"}
+                    </p>
                   </div>
-                  <Button
-                    onClick={handleDownloadBackup}
-                    disabled={isDownloading}
-                    variant="outline"
-                    size="sm"
-                  >
-                    {isDownloading ? "Downloading..." : "Download"}
-                  </Button>
                 </div>
-
-                {/* Restore Backup */}
-                <div className="flex items-center justify-between py-3 border-b border-zinc-900">
-                  <div className="flex items-start gap-3">
-                    <Upload className="w-5 h-5 mt-0.5 text-zinc-500" />
-                    <div>
-                      <p className="text-sm font-medium">Restore Backup</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
-                        Import a previously exported backup
-                      </p>
-                    </div>
-                  </div>
+                <div className="ml-8 mt-2">
                   <Button
-                    onClick={handleRestoreBackup}
+                    onClick={handleChangeDirectory}
+                    disabled={isChangingDirectory || !isSupported}
                     variant="outline"
                     size="sm"
+                    className="w-full sm:w-auto"
                   >
-                    Restore
+                    {isChangingDirectory ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Changing...
+                      </>
+                    ) : (
+                      <>
+                        <FolderOpen className="w-4 h-4 mr-2" />
+                        Change Location
+                      </>
+                    )}
                   </Button>
-                </div>
-              </div>
-            </section>
-
-            {/* Danger Zone */}
-            <section className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-1 text-red-500">
-                  Danger Zone
-                </h3>
-                <p className="text-sm text-zinc-500">Irreversible actions</p>
-              </div>
-
-              <div className="border border-red-900/50 rounded-lg p-4 bg-red-950/10">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-3">
-                    <Trash2 className="w-5 h-5 mt-0.5 text-red-500" />
-                    <div>
-                      <p className="text-sm font-medium text-red-400">
-                        Delete Account
-                      </p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
-                        Permanently delete all your data
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={handleDeleteAccount}
-                    variant="outline"
-                    size="sm"
-                    className="border-red-800 text-red-400 hover:bg-red-950 hover:border-red-700"
-                  >
-                    Delete
-                  </Button>
+                  {!isSupported && (
+                    <p className="text-xs text-zinc-500 mt-2">
+                      File System Access API is not supported in your browser
+                    </p>
+                  )}
                 </div>
               </div>
             </section>

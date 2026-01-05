@@ -6,23 +6,28 @@ import { JournalInfo } from "@/components/journal/JournalInfo";
 import { DayGrid } from "@/components/journal/DayGrid";
 import { JournalEditor } from "@/components/editor/JournalEditor";
 import { SettingsPage } from "@/components/settings/SettingsPage";
-import { TemplateSettings } from "@/components/settings/TemplateSettings";
 import { ShortcutsModal } from "@/components/shortcuts/ShortcutsModal";
 import { SettingsButton } from "@/components/settings/SettingsButton";
+import { FileSystemSetup } from "@/components/storage/FileSystemSetup";
 
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useFileSystemStorage } from "@/hooks/useFileSystemStorage";
 
 import { CalendarUtils } from "@/lib/date/calendar-utils";
-import { JournalStorage } from "@/lib/storage/journal-storage";
 
 export default function JournalPage() {
   const currentYear = new Date().getFullYear();
   const { entries, saveEntry, getEntry } = useJournalEntries();
+  const {
+    isInitialized,
+    isSupported,
+    needsSetup,
+    setupFileSystem,
+  } = useFileSystemStorage();
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isTemplateSettingsOpen, setIsTemplateSettingsOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   const handleDayClick = (dayIndex: number) => {
@@ -31,16 +36,20 @@ export default function JournalPage() {
     setIsEditorOpen(true);
   };
 
-  const handleSave = (memory: string) => {
+  const handleSave = async (memory: string) => {
     if (selectedDay === null) return;
     const key = CalendarUtils.getDayKey(currentYear, selectedDay);
-    saveEntry(key, memory);
+    await saveEntry(key, memory);
   };
 
   const getInitialText = () => {
     if (selectedDay === null) return "";
     const key = CalendarUtils.getDayKey(currentYear, selectedDay);
-    return getEntry(key)?.memory || JournalStorage.getTemplate();
+    return getEntry(key)?.memory || "";
+  };
+
+  const handleSetupFileSystem = async () => {
+    await setupFileSystem();
   };
 
   const getEntryDate = (): string | null => {
@@ -61,15 +70,14 @@ export default function JournalPage() {
       },
       onCloseModal: () => {
         if (isEditorOpen) setIsEditorOpen(false);
-        else if (isTemplateSettingsOpen) setIsTemplateSettingsOpen(false);
         else if (isSettingsOpen) setIsSettingsOpen(false);
         else if (isShortcutsOpen) setIsShortcutsOpen(false);
       },
       onShowShortcuts: () => {
         setIsShortcutsOpen(true);
       },
-      onOpenTemplates: () => {
-        setIsTemplateSettingsOpen(true);
+      onOpenSettings: () => {
+        setIsSettingsOpen(true);
       },
     },
   });
@@ -107,11 +115,6 @@ export default function JournalPage() {
         entryDate={getEntryDate()}
       />
 
-      <TemplateSettings
-        isOpen={isTemplateSettingsOpen}
-        onClose={() => setIsTemplateSettingsOpen(false)}
-      />
-
       <SettingsPage
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -120,6 +123,12 @@ export default function JournalPage() {
       <ShortcutsModal
         isOpen={isShortcutsOpen}
         onClose={() => setIsShortcutsOpen(false)}
+      />
+
+      <FileSystemSetup
+        isOpen={isInitialized && needsSetup}
+        onSetup={handleSetupFileSystem}
+        isSupported={isSupported}
       />
     </main>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ToastProvider } from "@/components/ui/Toast";
+import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
 import "./globals.css";
 
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <ServiceWorkerRegistration />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

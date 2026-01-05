@@ -6,7 +6,7 @@ export interface ShortcutHandlers {
   onNewNote: () => void;
   onCloseModal: () => void;
   onShowShortcuts: () => void;
-  onOpenTemplates: () => void;
+  onOpenSettings: () => void;
 }
 
 interface UseKeyboardShortcutsOptions {
@@ -35,13 +35,26 @@ export function useKeyboardShortcuts({
           handler: handlers.onShowShortcuts,
         },
         {
-          shortcut: SHORTCUTS.OPEN_TEMPLATES,
-          handler: handlers.onOpenTemplates,
+          shortcut: SHORTCUTS.OPEN_SETTINGS,
+          handler: handlers.onOpenSettings,
         },
       ];
 
       for (const { shortcut, handler } of shortcutMap) {
         if (ShortcutMatcher.matches(event, shortcut)) {
+          event.preventDefault();
+          handler();
+          break;
+        }
+        // Also check for Ctrl+, if the shortcut is meta+, (for cross-platform support)
+        if (
+          shortcut.modifiers?.meta &&
+          shortcut.key === "," &&
+          event.key === "," &&
+          (event.ctrlKey || event.metaKey) &&
+          !event.shiftKey &&
+          !event.altKey
+        ) {
           event.preventDefault();
           handler();
           break;
