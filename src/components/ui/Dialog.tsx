@@ -14,8 +14,11 @@ export function Dialog({ isOpen, onClose, children }: DialogProps) {
       onOpenChange={(open: boolean) => !open && onClose()}
     >
       <BaseDialog.Portal>
-        <BaseDialog.Backdrop className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50" />
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <BaseDialog.Backdrop 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50" 
+          aria-hidden="true"
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
           {children}
         </div>
       </BaseDialog.Portal>

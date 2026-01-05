@@ -14,9 +14,23 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   font-family: monospace;
 }
 
+/* Touch target improvements for mobile */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improve scrolling on mobile */
+@media (max-width: 640px) {
+  html {
+    -webkit-overflow-scrolling: touch;
+  }
+}

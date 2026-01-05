@@ -13,8 +13,8 @@ export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
   const days = Array.from({ length: 365 }, (_, i) => i);
 
   return (
-    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(12px,1fr))] gap-3 md:gap-4 max-w-5xl p-4 mx-auto">
-      <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 justify-center">
         {days.map((dayIndex) => {
           const key = CalendarUtils.getDayKey(year, dayIndex);
           const hasEntry = !!entries[key];

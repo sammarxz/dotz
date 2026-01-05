@@ -33,21 +33,22 @@ export default function JournalPage() {
   } = useJournalApp();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden p-8 md:p-12">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden p-4 sm:p-6 md:p-8 lg:p-12">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       />
       <Header onSettingsClick={handleOpenSettings} />
 
-      <main className="flex-1 flex flex-col items-center justify-center z-10 w-full max-w-6xl mx-auto">
+      <main className="flex-1 min-h-screen py-12 md:py-24 relative flex flex-col items-center justify-center z-10 ">
         <DayGrid
           year={currentYear}
           entries={entries}
           onDayClick={handleDayClick}
         />
+        <div className="fixed inset-0 bg-gradient-to-t from-background/50 to-transparent h-full w-full pointer-events-none" />
       </main>
 
       <Footer />

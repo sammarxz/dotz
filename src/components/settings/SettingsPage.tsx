@@ -104,29 +104,31 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black border border-zinc-900 text-white max-w-2xl max-h-[85vh] flex flex-col">
+      <DialogContent className="bg-black border border-zinc-900 text-white max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col m-2 sm:m-4">
         {/* Header */}
-        <div className="border-b border-zinc-900 px-8 py-5">
-          <h2 className="text-2xl font-bold">Settings</h2>
-          <p className="text-sm text-zinc-500 mt-1">
+        <div className="border-b border-zinc-900 px-4 sm:px-8 py-4 sm:py-5">
+          <h2 className="text-xl sm:text-2xl font-bold">Settings</h2>
+          <p className="text-xs sm:text-sm text-zinc-500 mt-1">
             Manage your preferences and data
           </p>
         </div>
 
         {/* Content */}
         <ScrollArea className="flex-1">
-          <div className="px-8 py-6 space-y-8">
+          <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
             {/* Preferences Section */}
             <section className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-1">Preferences</h3>
-                <p className="text-sm text-zinc-500">
+                <h3 className="text-base sm:text-lg font-semibold mb-1">
+                  Preferences
+                </h3>
+                <p className="text-xs sm:text-sm text-zinc-500">
                   Customize your writing experience
                 </p>
               </div>
 
               {/* Sound Effects */}
-              <div className="flex items-center justify-between py-3 border-b border-zinc-900">
+              <div className="flex items-center justify-between py-3 border-b border-zinc-900 gap-4">
                 <div className="flex items-start gap-3">
                   <Volume2 className="w-5 h-5 mt-0.5 text-zinc-500" />
                   <div>
@@ -181,8 +183,10 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
             {/* Storage Management Section */}
             <section className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-1">Storage</h3>
-                <p className="text-sm text-zinc-500">
+                <h3 className="text-base sm:text-lg font-semibold mb-1">
+                  Storage
+                </h3>
+                <p className="text-xs sm:text-sm text-zinc-500">
                   Manage where your journal entries are saved
                 </p>
               </div>
@@ -231,9 +235,14 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
         </ScrollArea>
 
         {/* Footer */}
-        <div className="border-t border-zinc-900 px-8 py-4 flex justify-between items-center">
-          <p className="text-xs text-zinc-600">Version 1.0.0</p>
-          <Button onClick={onClose} variant="ghost" size="sm">
+        <div className="border-t border-zinc-900 px-4 sm:px-8 py-3 sm:py-4 flex justify-between items-center">
+          <p className="text-[10px] sm:text-xs text-zinc-600">Version 1.0.0</p>
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="sm"
+            className="min-h-[44px] min-w-[44px]"
+          >
             Close
           </Button>
         </div>

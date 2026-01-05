@@ -59,13 +59,14 @@ export function JournalEditor({
     onChange: handleTextChange,
   });
 
-  const { handleKeyDown: handleSoundKeyDown, handleKeyUp: handleSoundKeyUp } = useTypewriterSound();
+  const { handleKeyDown: handleSoundKeyDown, handleKeyUp: handleSoundKeyUp } =
+    useTypewriterSound();
 
   const { isSaving } = useAutoSave(hasEdited ? text : null, handleSave);
 
   const displayDate =
     localLastSaved || (entryDate ? new Date(entryDate) : null);
-  
+
   const getDisplayText = () => {
     if (isSaving) return "Saving...";
     if (!displayDate) return "Never";
@@ -83,30 +84,33 @@ export function JournalEditor({
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black border border-zinc-900 text-white max-w-4xl h-[72vh] flex flex-col">
-        <div className="flex-1 w-full p-4">
+      <DialogContent className="bg-black border border-zinc-900 text-white max-w-4xl h-[85vh] sm:h-[72vh] flex flex-col m-2 sm:m-4">
+        <div className="flex-1 w-full p-3 sm:p-4 min-h-0">
           <ScrollArea className="h-full">
             <Textarea
               value={text}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               onKeyUp={handleKeyUp}
-              className="w-full h-full bg-transparent resize-none focus:outline-none"
+              className="w-full h-full bg-transparent resize-none focus:outline-none text-sm sm:text-base"
               placeholder="Comece a escrever..."
               autoFocus
+              aria-label="Journal entry editor"
             />
           </ScrollArea>
         </div>
 
-        <div className="text-lg px-4 py-5 flex justify-between items-center border-t border-zinc-900">
+        <div className="text-sm sm:text-lg px-3 sm:px-4 py-3 sm:py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 border-t border-zinc-900">
           <h2 className="font-bold text-white">{date}</h2>
 
-          <div className="text-lg flex items-baseline gap-2">
+          <div className="text-sm sm:text-lg flex flex-col sm:flex-row items-start sm:items-baseline gap-1 sm:gap-2">
             <span className="font-bold text-white">Last Modified:</span>
-            <span 
+            <span
               className={`font-normal transition-colors ${
                 isSaving ? "text-yellow-500" : "text-zinc-500"
               }`}
+              aria-live="polite"
+              aria-atomic="true"
             >
               {getDisplayText()}
             </span>
@@ -116,4 +120,3 @@ export function JournalEditor({
     </Dialog>
   );
 }
-
