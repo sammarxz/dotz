@@ -2,6 +2,8 @@
 
 Minimalist journaling for the focused mind. One dot, one day.
 
+![Dotz Preview](preview.png)
+
 ## Features
 
 - **365 Days**: Visual grid representing each day of the year
