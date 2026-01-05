@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 
-import { useAutoSave } from "@/hooks/useAutoSave";
-import { useMarkdownEditor } from "@/hooks/useMarkdownEditor";
-
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { Textarea } from "@/components/ui/Textarea";
+
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { useMarkdownEditor } from "@/hooks/useMarkdownEditor";
+import { useTypewriterSound } from "@/hooks/useTypewriterSound";
 
 import { CalendarUtils } from "@/lib/date/calendar-utils";
 
@@ -53,31 +54,43 @@ export function JournalEditor({
     setLocalLastSaved(new Date());
   };
 
-  const { handleKeyDown } = useMarkdownEditor({
+  const { handleKeyDown: handleMarkdownKeyDown } = useMarkdownEditor({
     value: text,
     onChange: handleTextChange,
   });
+
+  const { handleKeyDown: handleSoundKeyDown, handleKeyUp: handleSoundKeyUp } = useTypewriterSound();
 
   const { isSaving } = useAutoSave(hasEdited ? text : null, handleSave);
 
   const displayDate =
     localLastSaved || (entryDate ? new Date(entryDate) : null);
-
+  
   const getDisplayText = () => {
     if (isSaving) return "Saving...";
     if (!displayDate) return "Never";
     return CalendarUtils.formatRelative(displayDate);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    handleSoundKeyDown(e);
+    handleMarkdownKeyDown(e);
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    handleSoundKeyUp(e);
+  };
+
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-background border border-zinc-900 text-white max-w-4xl h-[72vh] flex flex-col">
+      <DialogContent className="bg-black border border-zinc-900 text-white max-w-4xl h-[72vh] flex flex-col">
         <div className="flex-1 w-full p-4">
           <ScrollArea className="h-full">
             <Textarea
               value={text}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
+              onKeyUp={handleKeyUp}
               className="w-full h-full bg-transparent resize-none focus:outline-none"
               placeholder="Comece a escrever..."
               autoFocus
@@ -90,7 +103,7 @@ export function JournalEditor({
 
           <div className="text-lg flex items-baseline gap-2">
             <span className="font-bold text-white">Last Modified:</span>
-            <span
+            <span 
               className={`font-normal transition-colors ${
                 isSaving ? "text-yellow-500" : "text-zinc-500"
               }`}
@@ -103,3 +116,4 @@ export function JournalEditor({
     </Dialog>
   );
 }
+

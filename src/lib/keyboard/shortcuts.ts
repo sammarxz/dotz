@@ -2,33 +2,30 @@ import { ShortcutDefinition } from "../types";
 
 export const SHORTCUTS: Record<string, ShortcutDefinition> = {
   NEW_NOTE: {
-    key: 'n',
+    key: "n",
     description: "Create today's note",
-    category: 'actions',
+    category: "actions",
   },
   CLOSE_MODAL: {
-    key: 'Escape',
-    description: 'Close modal',
-    category: 'navigation',
+    key: "Escape",
+    description: "Close modal",
+    category: "navigation",
   },
   SHOW_SHORTCUTS: {
-    key: '?',
-    description: 'Show Keyboard Shortcuts',
-    category: 'settings',
+    key: "?",
+    description: "Show Keyboard Shortcuts",
+    category: "settings",
     modifiers: { shift: true },
   },
   OPEN_TEMPLATES: {
-    key: 't',
-    description: 'open Templates',
-    category: 'settings',
+    key: "t",
+    description: "open Templates",
+    category: "settings",
   },
 };
 
 export class ShortcutMatcher {
-  static matches(
-    event: KeyboardEvent,
-    shortcut: ShortcutDefinition
-  ): boolean {
+  static matches(event: KeyboardEvent, shortcut: ShortcutDefinition): boolean {
     const { key, modifiers = {} } = shortcut;
 
     if (event.key !== key) return false;
@@ -45,14 +42,14 @@ export class ShortcutMatcher {
     const parts: string[] = [];
     const { modifiers = {} } = shortcut;
 
-    if (modifiers.ctrl) parts.push('Ctrl');
-    if (modifiers.shift) parts.push('Shift');
-    if (modifiers.alt) parts.push('Alt');
-    if (modifiers.meta) parts.push('⌘');
+    if (modifiers.ctrl) parts.push("Ctrl");
+    if (modifiers.shift) parts.push("Shift");
+    if (modifiers.alt) parts.push("Alt");
+    if (modifiers.meta) parts.push("⌘");
 
-    const keyDisplay = shortcut.key === ' ' ? 'Space' : shortcut.key;
+    const keyDisplay = shortcut.key === " " ? "Space" : shortcut.key;
     parts.push(keyDisplay);
 
-    return parts.join(' + ');
+    return parts.join(" + ");
   }
 }
