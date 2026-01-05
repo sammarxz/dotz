@@ -1,16 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Bell, Volume2, FolderOpen, RefreshCw } from "lucide-react";
+
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { SwitchComponent } from "@/components/ui/Switch";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { useSettings } from "@/hooks/useSettings";
 import { useToast } from "@/components/ui/Toast";
+
+import { useSettings } from "@/hooks/useSettings";
 import { useFileSystemStorage } from "@/hooks/useFileSystemStorage";
+
 import { FileSystemStorage } from "@/lib/storage/file-system-storage";
-import { Bell, Volume2, FolderOpen, RefreshCw } from "lucide-react";
 
 interface SettingsPageProps {
   isOpen: boolean;
@@ -20,7 +23,8 @@ interface SettingsPageProps {
 export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
   const { settings, updateSettings, enableNotifications } = useSettings();
   const { success, error } = useToast();
-  const { directoryPath, setupFileSystem, isSupported } = useFileSystemStorage();
+  const { directoryPath, setupFileSystem, isSupported } =
+    useFileSystemStorage();
   const [currentPath, setCurrentPath] = useState<string>("");
   const [isChangingDirectory, setIsChangingDirectory] = useState(false);
 
@@ -72,7 +76,10 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
 
   const handleChangeDirectory = async () => {
     if (!isSupported) {
-      error("Not supported", "File System Access API is not supported in your browser");
+      error(
+        "Not supported",
+        "File System Access API is not supported in your browser"
+      );
       return;
     }
 
@@ -184,7 +191,9 @@ export function SettingsPage({ isOpen, onClose }: SettingsPageProps) {
                 <div className="flex items-start gap-3">
                   <FolderOpen className="w-5 h-5 mt-0.5 text-zinc-500" />
                   <div className="flex-1">
-                    <label className="text-sm font-medium">Storage Location</label>
+                    <label className="text-sm font-medium">
+                      Storage Location
+                    </label>
                     <p className="text-xs text-zinc-500 mt-0.5 break-all">
                       {currentPath || "No directory selected"}
                     </p>

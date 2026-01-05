@@ -33,7 +33,7 @@ export class TypewriterSound {
     if (this.isLoaded) return;
 
     try {
-      // Cria pool de áudios para press
+      // Create pool of audio for press
       for (let i = 0; i < this.POOL_SIZE; i++) {
         const audio = new Audio();
         audio.volume = 0.4;
@@ -41,7 +41,7 @@ export class TypewriterSound {
         this.pressPool.push(audio);
       }
 
-      // Cria pool de áudios para release
+      // Create pool of audio for release
       for (let i = 0; i < this.POOL_SIZE; i++) {
         const audio = new Audio();
         audio.volume = 0.25; // Release mais suave
@@ -49,7 +49,7 @@ export class TypewriterSound {
         this.releasePool.push(audio);
       }
 
-      // Pré-carrega um som de cada
+      // Preload one sound for each
       if (this.pressPool[0]) {
         this.pressPool[0].src = this.SOUNDS.press.generic[0];
         await this.pressPool[0].load();
@@ -83,7 +83,7 @@ export class TypewriterSound {
       const audio = pool[currentIndex];
       if (!audio) return currentIndex;
 
-      // Se é array, seleciona aleatoriamente
+      // If it is an array, select randomly
       const selectedSound = Array.isArray(soundPath)
         ? soundPath[Math.floor(Math.random() * soundPath.length)]
         : soundPath;

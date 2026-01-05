@@ -51,18 +51,6 @@ export class CalendarUtils {
     });
   }
 
-  static formatDateTime(date: Date): string {
-    const datePart = this.formatDate(date);
-
-    const timePart = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-
-    return `${datePart}, ${timePart}`;
-  }
-
   static formatRelative(date: Date): string {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime(); 

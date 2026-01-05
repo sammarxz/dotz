@@ -5,7 +5,6 @@ import { JournalEntry } from "@/lib/types";
 
 export function useJournalEntries() {
   const [entries, setEntries] = useState<Record<string, JournalEntry>>({});
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadEntries = async () => {
@@ -20,8 +19,6 @@ export function useJournalEntries() {
         }
       } catch (error) {
         console.error("Failed to load entries", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -66,5 +63,5 @@ export function useJournalEntries() {
     [entries]
   );
 
-  return { entries, saveEntry, getEntry, isLoading };
+  return { entries, saveEntry, getEntry };
 }

@@ -1,8 +1,9 @@
 "use client";
 
+import { FolderOpen } from "lucide-react";
+
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
-import { FolderOpen } from "lucide-react";
 
 interface FileSystemSetupProps {
   isOpen: boolean;
@@ -45,11 +46,7 @@ export function FileSystemSetup({
             system.
           </p>
           <div className="flex gap-3 pt-2">
-            <Button
-              onClick={onSetup}
-              variant="default"
-              className="flex-1"
-            >
+            <Button onClick={onSetup} variant="default" className="flex-1">
               Choose Folder
             </Button>
           </div>

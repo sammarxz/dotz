@@ -1,135 +1,75 @@
 "use client";
 
-import { useState } from "react";
-
-import { JournalInfo } from "@/components/journal/JournalInfo";
 import { DayGrid } from "@/components/journal/DayGrid";
 import { JournalEditor } from "@/components/editor/JournalEditor";
 import { SettingsPage } from "@/components/settings/SettingsPage";
 import { ShortcutsModal } from "@/components/shortcuts/ShortcutsModal";
-import { SettingsButton } from "@/components/settings/SettingsButton";
 import { FileSystemSetup } from "@/components/storage/FileSystemSetup";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
-import { useJournalEntries } from "@/hooks/useJournalEntries";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { useFileSystemStorage } from "@/hooks/useFileSystemStorage";
-
-import { CalendarUtils } from "@/lib/date/calendar-utils";
+import { useJournalApp } from "@/hooks/useJournalApp";
 
 export default function JournalPage() {
-  const currentYear = new Date().getFullYear();
-  const { entries, saveEntry, getEntry } = useJournalEntries();
   const {
+    currentYear,
+    entries,
     isInitialized,
     isSupported,
     needsSetup,
-    setupFileSystem,
-  } = useFileSystemStorage();
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
-
-  const handleDayClick = (dayIndex: number) => {
-    if (CalendarUtils.isFutureDay(currentYear, dayIndex)) return;
-    setSelectedDay(dayIndex);
-    setIsEditorOpen(true);
-  };
-
-  const handleSave = async (memory: string) => {
-    if (selectedDay === null) return;
-    const key = CalendarUtils.getDayKey(currentYear, selectedDay);
-    await saveEntry(key, memory);
-  };
-
-  const getInitialText = () => {
-    if (selectedDay === null) return "";
-    const key = CalendarUtils.getDayKey(currentYear, selectedDay);
-    return getEntry(key)?.memory || "";
-  };
-
-  const handleSetupFileSystem = async () => {
-    await setupFileSystem();
-  };
-
-  const getEntryDate = (): string | null => {
-    if (selectedDay === null) return null;
-    const key = CalendarUtils.getDayKey(currentYear, selectedDay);
-    return getEntry(key)?.date ?? null;
-  };
-
-  // Atalhos do teclado
-  useKeyboardShortcuts({
-    enabled: true,
-    handlers: {
-      onNewNote: () => {
-        const today = CalendarUtils.getTodayIndex(currentYear);
-        if (!CalendarUtils.isFutureDay(currentYear, today)) {
-          handleDayClick(today);
-        }
-      },
-      onCloseModal: () => {
-        if (isEditorOpen) setIsEditorOpen(false);
-        else if (isSettingsOpen) setIsSettingsOpen(false);
-        else if (isShortcutsOpen) setIsShortcutsOpen(false);
-      },
-      onShowShortcuts: () => {
-        setIsShortcutsOpen(true);
-      },
-      onOpenSettings: () => {
-        setIsSettingsOpen(true);
-      },
-    },
-  });
+    isEditorOpen,
+    isSettingsOpen,
+    isShortcutsOpen,
+    handleDayClick,
+    handleSave,
+    handleOpenSettings,
+    handleSetupFileSystem,
+    initialText,
+    editorDate,
+    entryDate,
+    handleCloseEditor,
+    handleCloseSettings,
+    handleCloseShortcuts,
+  } = useJournalApp();
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <SettingsButton onClick={() => setIsSettingsOpen(true)} />
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden p-8 md:p-12">
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <Header onSettingsClick={handleOpenSettings} />
 
-      <div className="flex-1 flex items-center justify-center px-8 py-16">
-        <div className="w-full max-w-4xl space-y-8">
-          <DayGrid
-            year={currentYear}
-            entries={entries}
-            onDayClick={handleDayClick}
-          />
-          <JournalInfo
-            year={currentYear}
-            daysLeft={CalendarUtils.getDaysLeftInYear(currentYear)}
-          />
-        </div>
-      </div>
+      <main className="flex-1 flex flex-col items-center justify-center z-10 w-full max-w-6xl mx-auto">
+        <DayGrid
+          year={currentYear}
+          entries={entries}
+          onDayClick={handleDayClick}
+        />
+      </main>
+
+      <Footer />
 
       <JournalEditor
         isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        initialText={getInitialText()}
-        date={
-          selectedDay !== null
-            ? CalendarUtils.formatDate(
-                CalendarUtils.getDayOfYear(currentYear, selectedDay)
-              )
-            : ""
-        }
+        onClose={handleCloseEditor}
+        initialText={initialText}
+        date={editorDate}
         onSave={handleSave}
-        entryDate={getEntryDate()}
+        entryDate={entryDate}
       />
 
-      <SettingsPage
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
+      <SettingsPage isOpen={isSettingsOpen} onClose={handleCloseSettings} />
 
-      <ShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={handleCloseShortcuts} />
 
       <FileSystemSetup
         isOpen={isInitialized && needsSetup}
         onSetup={handleSetupFileSystem}
         isSupported={isSupported}
       />
-    </main>
+    </div>
   );
 }

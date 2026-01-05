@@ -13,28 +13,23 @@ export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
   const days = Array.from({ length: 365 }, (_, i) => i);
 
   return (
-    <div
-      className={`
-        grid
-        gap-2                 
-        w-full
-        grid-cols-[repeat(auto-fill,minmax(24px,1fr))]
-      `}
-    >
-      {days.map((dayIndex) => {
-        const key = CalendarUtils.getDayKey(year, dayIndex);
-        const hasEntry = !!entries[key];
+    <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(12px,1fr))] gap-3 md:gap-4 max-w-5xl p-4 mx-auto">
+      <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
+        {days.map((dayIndex) => {
+          const key = CalendarUtils.getDayKey(year, dayIndex);
+          const hasEntry = !!entries[key];
 
-        return (
-          <DayDot
-            key={dayIndex}
-            dayIndex={dayIndex}
-            year={year}
-            hasEntry={hasEntry}
-            onClick={() => onDayClick(dayIndex)}
-          />
-        );
-      })}
+          return (
+            <DayDot
+              key={dayIndex}
+              dayIndex={dayIndex}
+              year={year}
+              hasEntry={hasEntry}
+              onClick={() => onDayClick(dayIndex)}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -11,10 +11,8 @@ export function useTypewriterSound() {
   }, []);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Ignora teclas modificadoras
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     
-    // Ignora teclas especiais que não fazem som
     const ignoredKeys = [
       'Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab',
       'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
@@ -23,7 +21,6 @@ export function useTypewriterSound() {
     
     if (ignoredKeys.includes(e.key)) return;
 
-    // Sons específicos para teclas especiais
     if (e.key === 'Enter') {
       TypewriterSound.playPressEnter();
       return;
@@ -39,12 +36,10 @@ export function useTypewriterSound() {
       return;
     }
 
-    // Som genérico para outras teclas
     TypewriterSound.playPress();
   }, []);
 
   const handleKeyUp = useCallback((e: React.KeyboardEvent) => {
-    // Ignora teclas modificadoras
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     
     const ignoredKeys = [
@@ -55,7 +50,6 @@ export function useTypewriterSound() {
     
     if (ignoredKeys.includes(e.key)) return;
 
-    // Sons de release específicos
     if (e.key === 'Enter') {
       TypewriterSound.playReleaseEnter();
       return;
@@ -71,7 +65,6 @@ export function useTypewriterSound() {
       return;
     }
 
-    // Som genérico de release
     TypewriterSound.playRelease();
   }, []);
 

@@ -5,7 +5,6 @@ import { ServiceWorkerManager } from "@/lib/notifications/service-worker-manager
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
-    // Registra o Service Worker quando o componente monta
     const registerServiceWorker = async () => {
       if (typeof window !== "undefined" && "serviceWorker" in navigator) {
         try {

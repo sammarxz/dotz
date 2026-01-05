@@ -11,14 +11,12 @@ export function useSettings() {
   );
 
   useEffect(() => {
-    // Sincroniza som
     if (settings.soundEffects) {
       TypewriterSound.enable();
     } else {
       TypewriterSound.disable();
     }
 
-    // Sincroniza notificações
     if (settings.notifications.enabled) {
       ReminderManager.scheduleDaily(settings.notifications.time).catch((error) => {
         console.error("Failed to schedule notifications:", error);
