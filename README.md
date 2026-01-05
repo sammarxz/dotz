@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dotz
+
+Minimalist journaling for the focused mind. One dot, one day.
+
+## Features
+
+- **365 Days**: Visual grid representing each day of the year
+- **File System Storage**: Entries saved directly to your local file system
+- **Daily Reminders**: Get notified to write at your chosen time
+- **Typewriter Sounds**: Optional sound effects
+- **Markdown Support**: Write with markdown formatting
+- **Auto-save**: Entries automatically saved as you type
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Modern browser with File System Access API support (Chrome, Edge, Opera)
+
+### Installation
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Choose a folder to store your journal entries (first time setup)
+2. Click any dot to write an entry for that day
+3. Dots light up when you've written an entry
+4. Press `Cmd/Ctrl + ,` to open settings
 
-## Learn More
+## Keyboard Shortcuts
 
-To learn more about Next.js, take a look at the following resources:
+- `Cmd/Ctrl + N` - Open today's entry
+- `Cmd/Ctrl + ,` - Open settings
+- `Shift + ?` - Show shortcuts
+- `Escape` - Close modals
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16
+- TypeScript
+- Tailwind CSS
+- File System Access API
