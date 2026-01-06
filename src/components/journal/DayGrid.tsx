@@ -7,9 +7,10 @@ interface DayGridProps {
   year: number;
   entries: Record<string, JournalEntry>;
   onDayClick: (dayIndex: number) => void;
+  selectedDayIndex?: number | null;
 }
 
-export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
+export function DayGrid({ year, entries, onDayClick, selectedDayIndex }: DayGridProps) {
   const days = Array.from({ length: 365 }, (_, i) => i);
 
   return (
@@ -18,6 +19,7 @@ export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
         {days.map((dayIndex) => {
           const key = CalendarUtils.getDayKey(year, dayIndex);
           const hasEntry = !!entries[key];
+          const isSelected = selectedDayIndex === dayIndex;
 
           return (
             <DayDot
@@ -25,6 +27,7 @@ export function DayGrid({ year, entries, onDayClick }: DayGridProps) {
               dayIndex={dayIndex}
               year={year}
               hasEntry={hasEntry}
+              isSelected={isSelected}
               onClick={() => onDayClick(dayIndex)}
             />
           );

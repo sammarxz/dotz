@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useJournalEntries } from "./useJournalEntries";
 import { useKeyboardShortcuts } from "./useKeyboardShortcuts";
 import { useFileSystemStorage } from "./useFileSystemStorage";
+import { useDayNavigation } from "./useDayNavigation";
 
 import { CalendarUtils } from "@/lib/date/calendar-utils";
 
@@ -37,6 +38,25 @@ export function useJournalApp() {
       setIsEditorOpen(true);
     },
     [currentYear]
+  );
+
+  // Day navigation - only enabled when no modals are open
+  const isNavigationEnabled = !isEditorOpen && !isSettingsOpen && !isShortcutsOpen;
+  const { selectedDayIndex, setSelectedDayIndex } = useDayNavigation({
+    year: currentYear,
+    enabled: isNavigationEnabled,
+    onEnter: (dayIndex) => {
+      handleDayClick(dayIndex);
+    },
+  });
+
+  // Update navigation selection when user clicks a day
+  const handleDayClickWithNavigation = useCallback(
+    (dayIndex: number) => {
+      setSelectedDayIndex(dayIndex);
+      handleDayClick(dayIndex);
+    },
+    [handleDayClick, setSelectedDayIndex]
   );
 
   const handleSave = useCallback(
@@ -124,8 +144,11 @@ export function useJournalApp() {
     isSettingsOpen,
     isShortcutsOpen,
 
+    // Navigation
+    selectedDayIndex,
+
     // Handlers
-    handleDayClick,
+    handleDayClick: handleDayClickWithNavigation,
     handleSave,
     handleOpenSettings,
     handleSetupFileSystem: async () => {

@@ -20,6 +20,7 @@ export default function JournalPage() {
     isEditorOpen,
     isSettingsOpen,
     isShortcutsOpen,
+    selectedDayIndex,
     handleDayClick,
     handleSave,
     handleOpenSettings,
@@ -48,6 +49,7 @@ export default function JournalPage() {
           year={currentYear}
           entries={entries}
           onDayClick={handleDayClick}
+          selectedDayIndex={selectedDayIndex}
         />
       </main>
 

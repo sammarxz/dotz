@@ -8,10 +8,11 @@ interface DayDotProps {
   dayIndex: number;
   year: number;
   hasEntry: boolean;
+  isSelected?: boolean;
   onClick: () => void;
 }
 
-export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
+export function DayDot({ dayIndex, year, hasEntry, isSelected = false, onClick }: DayDotProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [isToday, setIsToday] = useState(false);
   const [isFuture, setIsFuture] = useState(false);
@@ -36,7 +37,7 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
     .join(" ");
 
   return (
-    <div className="relative group">
+    <div className="relative group" data-day-index={dayIndex}>
       <button
         onClick={onClick}
         disabled={futureDay}
@@ -46,7 +47,8 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
           "sm:min-w-[32px] sm:min-h-[32px]",
           futureDay
             ? "cursor-default opacity-20"
-            : "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full"
+            : "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full",
+          isSelected && !futureDay && "ring-2 ring-foreground ring-offset-2 ring-offset-background"
         )}
         aria-label={ariaDesc}
         aria-pressed={hasEntry}
@@ -59,8 +61,10 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
               ? "bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.8)]"
               : "bg-zinc-700",
             todayDay && "animate-pulse scale-125",
+            isSelected && !hasEntry && "ring-2 ring-foreground/50 scale-110",
             !futureDay &&
               !hasEntry &&
+              !isSelected &&
               "bg-zinc-900/50 active:bg-zinc-800 sm:hover:bg-zinc-800"
           )}
         />
