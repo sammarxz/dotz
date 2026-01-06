@@ -14,9 +14,7 @@ export default function JournalPage() {
   const {
     currentYear,
     entries,
-    isInitialized,
     isSupported,
-    needsSetup,
     storageMode,
     isEditorOpen,
     isSettingsOpen,
@@ -26,7 +24,6 @@ export default function JournalPage() {
     handleDayClick,
     handleSave,
     handleOpenSettings,
-    handleSetupFileSystem,
     migrateToFileSystem,
     handleSelectNewDirectory,
     handleUseLocalStorage,

@@ -7,6 +7,7 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dotz.marxz.me"),
   title: "dotz - Minimalist Journaling App",
   description:
     "A minimalist journaling app for the focused mind. One dot, one day. Track your year with 365 days of journaling.",
@@ -28,6 +29,14 @@ export const metadata: Metadata = {
     description:
       "A minimalist journaling app for the focused mind. One dot, one day.",
     siteName: "dotz",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "dotz - Minimalist Journaling App",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -35,6 +44,7 @@ export const metadata: Metadata = {
     description:
       "A minimalist journaling app for the focused mind. One dot, one day.",
     creator: "@sammarxz",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
