@@ -244,8 +244,8 @@ export class FileSystemStorage {
 
         // Remove old individual files
         for (const key of Object.keys(entries)) {
+          const fileName = `${key}.json`;
           try {
-            const fileName = `${key}.json`;
             await this.directoryHandle.removeEntry(fileName);
           } catch (error) {
             console.error(`Failed to remove old file ${fileName}`, error);
