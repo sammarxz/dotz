@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { CalendarUtils } from "@/lib/date/calendar-utils";
 import { cn } from "@/lib/utils";
 
@@ -9,13 +12,24 @@ interface DayDotProps {
 }
 
 export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
-  const isToday = dayIndex === CalendarUtils.getTodayIndex(year);
-  const isFuture = CalendarUtils.isFutureDay(year, dayIndex);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isToday, setIsToday] = useState(false);
+  const [isFuture, setIsFuture] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setIsToday(dayIndex === CalendarUtils.getTodayIndex(year));
+    setIsFuture(CalendarUtils.isFutureDay(year, dayIndex));
+  }, [dayIndex, year]);
+
+  // Only calculate these after hydration to avoid mismatch
+  const futureDay = isMounted && isFuture;
+  const todayDay = isMounted && isToday;
 
   const ariaDesc = [
     `Day ${dayIndex + 1}`,
-    isToday ? "(Today)" : null,
-    isFuture ? "(Future day – not editable)" : null,
+    todayDay ? "(Today)" : null,
+    futureDay ? "(Future day – not editable)" : null,
     hasEntry ? "(has memory)" : "(no memory)",
   ]
     .filter(Boolean)
@@ -25,18 +39,18 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
     <div className="relative group">
       <button
         onClick={onClick}
-        disabled={isFuture}
+        disabled={futureDay}
         className={cn(
           "relative transition-all touch-manipulation",
           "min-w-[44px] min-h-[44px] flex items-center justify-center",
           "sm:min-w-[32px] sm:min-h-[32px]",
-          isFuture
+          futureDay
             ? "cursor-default opacity-20"
             : "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full"
         )}
         aria-label={ariaDesc}
         aria-pressed={hasEntry}
-        tabIndex={isFuture ? -1 : 0}
+        tabIndex={futureDay ? -1 : 0}
       >
         <div
           className={cn(
@@ -44,8 +58,8 @@ export function DayDot({ dayIndex, year, hasEntry, onClick }: DayDotProps) {
             hasEntry
               ? "bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.8)]"
               : "bg-zinc-700",
-            isToday && "animate-pulse scale-125",
-            !isFuture &&
+            todayDay && "animate-pulse scale-125",
+            !futureDay &&
               !hasEntry &&
               "bg-zinc-900/50 active:bg-zinc-800 sm:hover:bg-zinc-800"
           )}

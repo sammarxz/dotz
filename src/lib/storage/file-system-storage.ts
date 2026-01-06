@@ -19,7 +19,7 @@ export class FileSystemStorage {
     return "showDirectoryPicker" in window;
   }
 
-  static async requestDirectory(): Promise<boolean> {
+  static async requestDirectory(): Promise<{ success: boolean; cancelled?: boolean }> {
     if (!this.isSupported()) {
       throw new Error("File System Access API not supported");
     }
@@ -32,10 +32,16 @@ export class FileSystemStorage {
 
       await this.persistDirectoryHandle();
 
-      return true;
+      return { success: true };
     } catch (error) {
-      console.error("User cancelled directory selection", error);
-      return false;
+      // Check if user cancelled the operation
+      if (error instanceof DOMException && error.name === "AbortError") {
+        // User cancelled - this is not an error, just return cancelled flag
+        return { success: false, cancelled: true };
+      }
+      // Other errors
+      console.error("Failed to request directory", error);
+      return { success: false, cancelled: false };
     }
   }
 

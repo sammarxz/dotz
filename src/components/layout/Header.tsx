@@ -33,7 +33,7 @@ export function Header({ onSettingsClick }: HeaderProps) {
           </a>
         </span>
       </div>
-      <nav className="flex uppercase flex-col items-end gap-1">
+      <nav className="flex uppercase flex-col items-end gap-2">
         <button
           onClick={onSettingsClick}
           className="text-base  text-muted-foreground 

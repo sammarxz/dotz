@@ -8,24 +8,6 @@ export function useFileSystemStorage() {
   const [needsSetup, setNeedsSetup] = useState(false);
   const [directoryPath, setDirectoryPath] = useState<string>("");
 
-  const migrateFromLocalStorage = async () => {
-    try {
-      // Migrate entries
-      const entriesKey = "journal-entries";
-      const storedEntries = localStorage.getItem(entriesKey);
-
-      if (storedEntries) {
-        const entries: Record<string, JournalEntry> = JSON.parse(storedEntries);
-        for (const [key, entry] of Object.entries(entries)) {
-          await FileSystemStorage.saveEntry(key, entry);
-        }
-        // Remove from localStorage after successful migration
-        localStorage.removeItem(entriesKey);
-      }
-    } catch (error) {
-      console.error("Failed to migrate data from localStorage", error);
-    }
-  };
 
   useEffect(() => {
     const checkSupport = () => {
@@ -50,29 +32,28 @@ export function useFileSystemStorage() {
           setNeedsSetup(false);
           setDirectoryPath(FileSystemStorage.getDirectoryPath());
         } else {
+          // Don't require setup - use localStorage by default
           setIsInitialized(true);
-          setNeedsSetup(true);
+          setNeedsSetup(false);
         }
       } catch (error) {
         console.error("Failed to initialize storage", error);
         setIsInitialized(true);
-        setNeedsSetup(true);
+        setNeedsSetup(false);
       }
     };
 
     checkSupport();
   }, []);
 
-  const setupFileSystem = useCallback(async (): Promise<boolean> => {
+  const setupFileSystem = useCallback(async (): Promise<{ success: boolean; cancelled?: boolean }> => {
     if (!isSupported) {
-      return false;
+      return { success: false };
     }
 
     try {
-      const granted = await FileSystemStorage.requestDirectory();
-      if (granted) {
-        // Migrate data from localStorage if it exists
-        await migrateFromLocalStorage();
+      const result = await FileSystemStorage.requestDirectory();
+      if (result.success) {
         // Migrate from individual files to single journal.json if needed
         await FileSystemStorage.migrateFromIndividualFiles();
         
@@ -80,12 +61,12 @@ export function useFileSystemStorage() {
         setIsInitialized(true);
         setNeedsSetup(false);
         setDirectoryPath(newPath);
-        return true;
+        return { success: true };
       }
-      return false;
+      return result;
     } catch (error) {
       console.error("Failed to setup file system", error);
-      return false;
+      return { success: false };
     }
   }, [isSupported]);
 

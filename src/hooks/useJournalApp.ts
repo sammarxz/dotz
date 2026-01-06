@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import { useJournalEntries } from "./useJournalEntries";
 import { useKeyboardShortcuts } from "./useKeyboardShortcuts";
@@ -7,8 +7,21 @@ import { useFileSystemStorage } from "./useFileSystemStorage";
 import { CalendarUtils } from "@/lib/date/calendar-utils";
 
 export function useJournalApp() {
-  const currentYear = new Date().getFullYear();
-  const { entries, saveEntry, getEntry } = useJournalEntries();
+  // Use state to ensure consistent year between server and client
+  const [currentYear, setCurrentYear] = useState(() => {
+    if (typeof window === "undefined") {
+      // Server-side: use a consistent value
+      return new Date().getFullYear();
+    }
+    // Client-side: will be set in useEffect
+    return new Date().getFullYear();
+  });
+
+  useEffect(() => {
+    // Ensure year is set correctly on client
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+  const { entries, saveEntry, getEntry, storageMode, migrateToFileSystem } = useJournalEntries();
   const { isInitialized, isSupported, needsSetup, setupFileSystem } =
     useFileSystemStorage();
 
@@ -104,6 +117,7 @@ export function useJournalApp() {
     isInitialized,
     isSupported,
     needsSetup,
+    storageMode,
 
     // Modal states
     isEditorOpen,
@@ -117,6 +131,7 @@ export function useJournalApp() {
     handleSetupFileSystem: async () => {
       await setupFileSystem();
     },
+    migrateToFileSystem,
 
     // Editor data
     initialText: getInitialText(),

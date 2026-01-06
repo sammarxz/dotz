@@ -4,7 +4,6 @@ import { DayGrid } from "@/components/journal/DayGrid";
 import { JournalEditor } from "@/components/editor/JournalEditor";
 import { SettingsPage } from "@/components/settings/SettingsPage";
 import { ShortcutsModal } from "@/components/shortcuts/ShortcutsModal";
-import { FileSystemSetup } from "@/components/storage/FileSystemSetup";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
@@ -17,6 +16,7 @@ export default function JournalPage() {
     isInitialized,
     isSupported,
     needsSetup,
+    storageMode,
     isEditorOpen,
     isSettingsOpen,
     isShortcutsOpen,
@@ -24,6 +24,7 @@ export default function JournalPage() {
     handleSave,
     handleOpenSettings,
     handleSetupFileSystem,
+    migrateToFileSystem,
     initialText,
     editorDate,
     entryDate,
@@ -42,13 +43,12 @@ export default function JournalPage() {
       />
       <Header onSettingsClick={handleOpenSettings} />
 
-      <main className="flex-1 min-h-screen py-12 md:py-24 relative flex flex-col items-center justify-center z-10 ">
+      <main className="flex-1 min-h-screen my-12 md:my-24 relative flex flex-col items-center justify-center z-10 ">
         <DayGrid
           year={currentYear}
           entries={entries}
           onDayClick={handleDayClick}
         />
-        <div className="fixed inset-0 bg-gradient-to-t from-background/50 to-transparent h-full w-full pointer-events-none" />
       </main>
 
       <Footer />
@@ -62,15 +62,15 @@ export default function JournalPage() {
         entryDate={entryDate}
       />
 
-      <SettingsPage isOpen={isSettingsOpen} onClose={handleCloseSettings} />
-
-      <ShortcutsModal isOpen={isShortcutsOpen} onClose={handleCloseShortcuts} />
-
-      <FileSystemSetup
-        isOpen={isInitialized && needsSetup}
-        onSetup={handleSetupFileSystem}
+      <SettingsPage
+        isOpen={isSettingsOpen}
+        onClose={handleCloseSettings}
+        storageMode={storageMode}
+        migrateToFileSystem={migrateToFileSystem}
         isSupported={isSupported}
       />
+
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={handleCloseShortcuts} />
     </div>
   );
 }
