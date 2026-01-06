@@ -44,6 +44,8 @@ export function useFileSystemStorage() {
       try {
         const restored = await FileSystemStorage.restoreDirectory();
         if (restored) {
+          // Migrate from individual files to single journal.json if needed
+          await FileSystemStorage.migrateFromIndividualFiles();
           setIsInitialized(true);
           setNeedsSetup(false);
           setDirectoryPath(FileSystemStorage.getDirectoryPath());
@@ -71,6 +73,8 @@ export function useFileSystemStorage() {
       if (granted) {
         // Migrate data from localStorage if it exists
         await migrateFromLocalStorage();
+        // Migrate from individual files to single journal.json if needed
+        await FileSystemStorage.migrateFromIndividualFiles();
         
         const newPath = FileSystemStorage.getDirectoryPath();
         setIsInitialized(true);
