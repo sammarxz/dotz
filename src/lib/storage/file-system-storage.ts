@@ -172,13 +172,21 @@ export class FileSystemStorage {
       
       return data;
     } catch (error) {
-      // Check if directory was deleted
-      if (this.isDirectoryDeletedError(error)) {
-        // Clear directory handle
-        this.directoryHandle = null;
-        throw new Error("DIRECTORY_DELETED");
+      // If file doesn't exist (NotFoundError), that's normal for a new directory
+      // Only treat as directory deleted if it's an InvalidStateError or other directory-level error
+      if (error instanceof DOMException) {
+        if (error.name === "NotFoundError") {
+          // File doesn't exist yet - this is normal, not an error
+          return { entries: {} };
+        }
+        // Check if it's a directory-level error (not just file not found)
+        if (error.name === "InvalidStateError" || error.name === "SecurityError") {
+          // Directory was deleted or permission revoked
+          this.directoryHandle = null;
+          throw new Error("DIRECTORY_DELETED");
+        }
       }
-      // File doesn't exist yet, return empty structure
+      // For any other error, assume file doesn't exist yet
       return { entries: {} };
     }
   }
@@ -198,11 +206,13 @@ export class FileSystemStorage {
       await writable.write(JSON.stringify(data, null, 2));
       await writable.close();
     } catch (error) {
-      // Check if directory was deleted
-      if (this.isDirectoryDeletedError(error)) {
-        // Clear directory handle
-        this.directoryHandle = null;
-        throw new Error("DIRECTORY_DELETED");
+      // Check if directory was deleted (InvalidStateError or SecurityError)
+      if (error instanceof DOMException) {
+        if (error.name === "InvalidStateError" || error.name === "SecurityError") {
+          // Directory was deleted or permission revoked
+          this.directoryHandle = null;
+          throw new Error("DIRECTORY_DELETED");
+        }
       }
       throw error;
     }
