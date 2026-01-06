@@ -4,6 +4,7 @@ import { DayGrid } from "@/components/journal/DayGrid";
 import { JournalEditor } from "@/components/editor/JournalEditor";
 import { SettingsPage } from "@/components/settings/SettingsPage";
 import { ShortcutsModal } from "@/components/shortcuts/ShortcutsModal";
+import { DirectoryRecoveryModal } from "@/components/storage/DirectoryRecoveryModal";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
@@ -20,12 +21,16 @@ export default function JournalPage() {
     isEditorOpen,
     isSettingsOpen,
     isShortcutsOpen,
+    directoryDeleted,
     selectedDayIndex,
     handleDayClick,
     handleSave,
     handleOpenSettings,
     handleSetupFileSystem,
     migrateToFileSystem,
+    handleSelectNewDirectory,
+    handleUseLocalStorage,
+    isSelectingNewDirectory,
     initialText,
     editorDate,
     entryDate,
@@ -73,6 +78,13 @@ export default function JournalPage() {
       />
 
       <ShortcutsModal isOpen={isShortcutsOpen} onClose={handleCloseShortcuts} />
+
+      <DirectoryRecoveryModal
+        isOpen={directoryDeleted}
+        onSelectNewDirectory={handleSelectNewDirectory}
+        onUseLocalStorage={handleUseLocalStorage}
+        isSelecting={isSelectingNewDirectory}
+      />
     </div>
   );
 }

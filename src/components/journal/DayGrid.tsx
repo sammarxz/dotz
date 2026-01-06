@@ -18,7 +18,9 @@ export function DayGrid({ year, entries, onDayClick, selectedDayIndex }: DayGrid
       <div className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-3 lg:gap-4 justify-center">
         {days.map((dayIndex) => {
           const key = CalendarUtils.getDayKey(year, dayIndex);
-          const hasEntry = !!entries[key];
+          const entry = entries[key];
+          // Consider entry as "has entry" only if it has non-empty content
+          const hasEntry = !!entry && entry.memory.trim() !== "";
           const isSelected = selectedDayIndex === dayIndex;
 
           return (

@@ -4,7 +4,12 @@ import { FileSystemStorage } from "@/lib/storage/file-system-storage";
 import { LocalStorageManager } from "@/lib/storage/local-storage-manager";
 import { JournalEntry } from "@/lib/types";
 
-export function useJournalEntries() {
+interface UseJournalEntriesOptions {
+  onDirectoryDeleted?: () => void;
+}
+
+export function useJournalEntries(options?: UseJournalEntriesOptions) {
+  const { onDirectoryDeleted } = options || {};
   // Initialize with empty state to avoid hydration mismatch
   // This ensures server and client render the same initial state
   const [entries, setEntries] = useState<Record<string, JournalEntry>>(() => {
@@ -24,12 +29,38 @@ export function useJournalEntries() {
         if (FileSystemStorage.isSupported()) {
           const hasDirectory = await FileSystemStorage.restoreDirectory();
           if (hasDirectory) {
+            // Check if directory is still accessible
+            const isAccessible = await FileSystemStorage.checkDirectoryAccess();
+            if (!isAccessible) {
+              // Directory was deleted, notify and fallback to localStorage
+              if (onDirectoryDeleted) {
+                onDirectoryDeleted();
+              }
+              const allEntries = LocalStorageManager.getAllEntries();
+              setEntries(allEntries);
+              setStorageMode("localStorage");
+              return;
+            }
             // Migrate from individual files to single journal.json if needed
             await FileSystemStorage.migrateFromIndividualFiles();
-            const allEntries = await FileSystemStorage.getAllEntries();
-            setEntries(allEntries);
-            setStorageMode("fileSystem");
-            return;
+            try {
+              const allEntries = await FileSystemStorage.getAllEntries();
+              setEntries(allEntries);
+              setStorageMode("fileSystem");
+              return;
+            } catch (error) {
+              // Directory was deleted during operation
+              if (error instanceof Error && error.message === "DIRECTORY_DELETED") {
+                if (onDirectoryDeleted) {
+                  onDirectoryDeleted();
+                }
+                const allEntries = LocalStorageManager.getAllEntries();
+                setEntries(allEntries);
+                setStorageMode("localStorage");
+                return;
+              }
+              throw error;
+            }
           }
         }
 
@@ -50,38 +81,35 @@ export function useJournalEntries() {
   }, []);
 
   const saveEntry = useCallback(async (key: string, memory: string) => {
-    if (memory.trim() === "") {
-      try {
-        if (storageMode === "fileSystem") {
-          await FileSystemStorage.deleteEntry(key);
-        } else {
-          LocalStorageManager.deleteEntry(key);
-        }
-        setEntries((prev) => {
-          const newEntries = { ...prev };
-          delete newEntries[key];
-          return newEntries;
-        });
-      } catch (error) {
-        console.error("Failed to delete entry", error);
+    // Always save the entry, even if it's empty
+    // This allows users to explicitly save empty entries
+    const entry: JournalEntry = {
+      date: new Date().toISOString(),
+      memory: memory.trim(), // Save trimmed version but still save even if empty
+    };
+    
+    try {
+      if (storageMode === "fileSystem") {
+        await FileSystemStorage.saveEntry(key, entry);
+      } else {
+        LocalStorageManager.saveEntry(key, entry);
       }
-    } else {
-      const entry: JournalEntry = {
-        date: new Date().toISOString(),
-        memory,
-      };
-      try {
-        if (storageMode === "fileSystem") {
-          await FileSystemStorage.saveEntry(key, entry);
-        } else {
-          LocalStorageManager.saveEntry(key, entry);
+      setEntries((prev) => ({ ...prev, [key]: entry }));
+    } catch (error) {
+      console.error("Failed to save entry", error);
+      // Check if directory was deleted
+      if (error instanceof Error && error.message === "DIRECTORY_DELETED") {
+        // Notify that directory was deleted
+        if (onDirectoryDeleted) {
+          onDirectoryDeleted();
         }
+        // Fallback to localStorage
+        LocalStorageManager.saveEntry(key, entry);
         setEntries((prev) => ({ ...prev, [key]: entry }));
-      } catch (error) {
-        console.error("Failed to save entry", error);
+        setStorageMode("localStorage");
       }
     }
-  }, [storageMode]);
+  }, [storageMode, onDirectoryDeleted]);
 
   const getEntry = useCallback(
     (key: string): JournalEntry | undefined => {

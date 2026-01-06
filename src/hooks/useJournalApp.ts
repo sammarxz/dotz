@@ -22,8 +22,15 @@ export function useJournalApp() {
     // Ensure year is set correctly on client
     setCurrentYear(new Date().getFullYear());
   }, []);
-  const { entries, saveEntry, getEntry, storageMode, migrateToFileSystem } = useJournalEntries();
-  const { isInitialized, isSupported, needsSetup, setupFileSystem } =
+  const [directoryDeleted, setDirectoryDeleted] = useState(false);
+  const [isSelectingNewDirectory, setIsSelectingNewDirectory] = useState(false);
+
+  const { entries, saveEntry, getEntry, storageMode, migrateToFileSystem } = useJournalEntries({
+    onDirectoryDeleted: () => {
+      setDirectoryDeleted(true);
+    },
+  });
+  const { isInitialized, isSupported, needsSetup, setupFileSystem, clearDirectoryAndUseLocalStorage } =
     useFileSystemStorage();
 
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -130,6 +137,29 @@ export function useJournalApp() {
     },
   });
 
+  const handleSelectNewDirectory = useCallback(async () => {
+    setIsSelectingNewDirectory(true);
+    try {
+      const result = await setupFileSystem();
+      if (result.success) {
+        setDirectoryDeleted(false);
+        // Reload entries from new directory
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Failed to select new directory", error);
+    } finally {
+      setIsSelectingNewDirectory(false);
+    }
+  }, [setupFileSystem]);
+
+  const handleUseLocalStorage = useCallback(async () => {
+    await clearDirectoryAndUseLocalStorage();
+    setDirectoryDeleted(false);
+    // Reload to refresh state
+    window.location.reload();
+  }, [clearDirectoryAndUseLocalStorage]);
+
   return {
     // Data
     currentYear,
@@ -143,6 +173,7 @@ export function useJournalApp() {
     isEditorOpen,
     isSettingsOpen,
     isShortcutsOpen,
+    directoryDeleted,
 
     // Navigation
     selectedDayIndex,
@@ -155,6 +186,9 @@ export function useJournalApp() {
       await setupFileSystem();
     },
     migrateToFileSystem,
+    handleSelectNewDirectory,
+    handleUseLocalStorage,
+    isSelectingNewDirectory,
 
     // Editor data
     initialText: getInitialText(),

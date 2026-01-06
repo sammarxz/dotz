@@ -40,13 +40,20 @@ export function JournalEditor({
   }, [isOpen, initialText]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    if (!hasEdited) setHasEdited(true);
+    const newText = e.target.value;
+    setText(newText);
+    // Mark as edited if text changed (even if it's now empty)
+    if (newText !== initialText) {
+      setHasEdited(true);
+    }
   };
 
   const handleTextChange = (newText: string) => {
     setText(newText);
-    if (!hasEdited) setHasEdited(true);
+    // Mark as edited if text changed (even if it's now empty)
+    if (newText !== initialText) {
+      setHasEdited(true);
+    }
   };
 
   const handleSave = (value: string) => {
@@ -62,7 +69,12 @@ export function JournalEditor({
   const { handleKeyDown: handleSoundKeyDown, handleKeyUp: handleSoundKeyUp } =
     useTypewriterSound();
 
-  const { isSaving } = useAutoSave(hasEdited ? text : null, handleSave);
+  // Always pass text to auto-save when editor is open and has been edited
+  // This ensures empty strings are also saved
+  const { isSaving } = useAutoSave(
+    isOpen && hasEdited ? text : null,
+    handleSave
+  );
 
   const displayDate =
     localLastSaved || (entryDate ? new Date(entryDate) : null);
@@ -84,7 +96,7 @@ export function JournalEditor({
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black border border-zinc-900 text-white max-w-4xl h-[85vh] sm:h-[72vh] flex flex-col m-2 sm:m-4">
+      <DialogContent className="bg-background border border-zinc-900 text-white max-w-4xl h-[85vh] sm:h-[72vh] flex flex-col m-2 sm:m-4">
         <div className="flex-1 w-full p-3 sm:p-4 min-h-0">
           <ScrollArea className="h-full">
             <Textarea

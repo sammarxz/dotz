@@ -108,6 +108,50 @@ export class FileSystemStorage {
     });
   }
 
+  private static isDirectoryDeletedError(error: unknown): boolean {
+    if (error instanceof DOMException) {
+      // Check for common errors that indicate directory was deleted
+      return (
+        error.name === "NotFoundError" ||
+        error.name === "InvalidStateError" ||
+        error.message.includes("directory") ||
+        error.message.includes("not found")
+      );
+    }
+    return false;
+  }
+
+  static async checkDirectoryAccess(): Promise<boolean> {
+    if (!this.directoryHandle) {
+      return false;
+    }
+
+    try {
+      // Try to access the directory
+      const iterator = this.directoryHandle.keys();
+      await iterator.next();
+      return true;
+    } catch (error) {
+      // Directory was deleted or permission revoked
+      if (this.isDirectoryDeletedError(error)) {
+        // Clear the directory handle
+        this.directoryHandle = null;
+        // Clear from IndexedDB
+        try {
+          const db = await this.openDB();
+          const tx = db.transaction("handles", "readwrite");
+          const store = tx.objectStore("handles");
+          await store.delete("directory");
+        } catch {
+          // Ignore errors clearing IndexedDB
+        }
+        localStorage.removeItem("fs-directory-handle");
+        return false;
+      }
+      return false;
+    }
+  }
+
   private static async readJournalFile(): Promise<JournalData> {
     if (!this.directoryHandle) {
       throw new Error("No directory selected");
@@ -128,6 +172,12 @@ export class FileSystemStorage {
       
       return data;
     } catch (error) {
+      // Check if directory was deleted
+      if (this.isDirectoryDeletedError(error)) {
+        // Clear directory handle
+        this.directoryHandle = null;
+        throw new Error("DIRECTORY_DELETED");
+      }
       // File doesn't exist yet, return empty structure
       return { entries: {} };
     }
@@ -138,14 +188,24 @@ export class FileSystemStorage {
       throw new Error("No directory selected");
     }
 
-    const fileHandle = await this.directoryHandle.getFileHandle(
-      this.JOURNAL_FILE_NAME,
-      { create: true }
-    );
+    try {
+      const fileHandle = await this.directoryHandle.getFileHandle(
+        this.JOURNAL_FILE_NAME,
+        { create: true }
+      );
 
-    const writable = await fileHandle.createWritable();
-    await writable.write(JSON.stringify(data, null, 2));
-    await writable.close();
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(data, null, 2));
+      await writable.close();
+    } catch (error) {
+      // Check if directory was deleted
+      if (this.isDirectoryDeletedError(error)) {
+        // Clear directory handle
+        this.directoryHandle = null;
+        throw new Error("DIRECTORY_DELETED");
+      }
+      throw error;
+    }
   }
 
   static async saveEntry(key: string, entry: JournalEntry): Promise<void> {
@@ -153,9 +213,16 @@ export class FileSystemStorage {
       throw new Error("No directory selected");
     }
 
-    const data = await this.readJournalFile();
-    data.entries[key] = entry;
-    await this.writeJournalFile(data);
+    try {
+      const data = await this.readJournalFile();
+      data.entries[key] = entry;
+      await this.writeJournalFile(data);
+    } catch (error) {
+      if (error instanceof Error && error.message === "DIRECTORY_DELETED") {
+        throw error;
+      }
+      throw error;
+    }
   }
 
   static async getEntry(key: string): Promise<JournalEntry | null> {
@@ -180,8 +247,25 @@ export class FileSystemStorage {
       const data = await this.readJournalFile();
       return data.entries;
     } catch (error) {
+      if (error instanceof Error && error.message === "DIRECTORY_DELETED") {
+        throw error;
+      }
       console.error("Failed to read entries", error);
       return {};
+    }
+  }
+
+  static async clearDirectoryHandle(): Promise<void> {
+    this.directoryHandle = null;
+    localStorage.removeItem("fs-directory-handle");
+    // Clear from IndexedDB
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction("handles", "readwrite");
+      const store = tx.objectStore("handles");
+      await store.delete("directory");
+    } catch (error) {
+      console.error("Failed to clear directory from IndexedDB", error);
     }
   }
 

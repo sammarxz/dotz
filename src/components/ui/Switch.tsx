@@ -27,7 +27,9 @@ export function SwitchComponent({
       <SwitchBase.Thumb
         className={cn(
           "pointer-events-none block h-4 w-4 rounded-full shadow-lg ring-0 transition-transform",
-          checked ? "translate-x-4 bg-black" : "translate-x-0.5 bg-zinc-500"
+          checked
+            ? "translate-x-4 bg-background"
+            : "translate-x-0.5 bg-zinc-500"
         )}
       />
     </SwitchBase.Root>

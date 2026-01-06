@@ -12,7 +12,13 @@ interface DayDotProps {
   onClick: () => void;
 }
 
-export function DayDot({ dayIndex, year, hasEntry, isSelected = false, onClick }: DayDotProps) {
+export function DayDot({
+  dayIndex,
+  year,
+  hasEntry,
+  isSelected = false,
+  onClick,
+}: DayDotProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [isToday, setIsToday] = useState(false);
   const [isFuture, setIsFuture] = useState(false);
@@ -23,7 +29,6 @@ export function DayDot({ dayIndex, year, hasEntry, isSelected = false, onClick }
     setIsFuture(CalendarUtils.isFutureDay(year, dayIndex));
   }, [dayIndex, year]);
 
-  // Only calculate these after hydration to avoid mismatch
   const futureDay = isMounted && isFuture;
   const todayDay = isMounted && isToday;
 
@@ -46,9 +51,11 @@ export function DayDot({ dayIndex, year, hasEntry, isSelected = false, onClick }
           "min-w-[44px] min-h-[44px] flex items-center justify-center",
           "sm:min-w-[32px] sm:min-h-[32px]",
           futureDay
-            ? "cursor-default opacity-20"
+            ? "cursor-default opacity-30"
             : "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-full",
-          isSelected && !futureDay && "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+          isSelected &&
+            !futureDay &&
+            "ring-2 ring-foreground/10 ring-offset-2 ring-offset-background"
         )}
         aria-label={ariaDesc}
         aria-pressed={hasEntry}
@@ -65,7 +72,7 @@ export function DayDot({ dayIndex, year, hasEntry, isSelected = false, onClick }
             !futureDay &&
               !hasEntry &&
               !isSelected &&
-              "bg-zinc-900/50 active:bg-zinc-800 sm:hover:bg-zinc-800"
+              "bg-zinc-900/80 active:bg-zinc-800 sm:hover:bg-zinc-800"
           )}
         />
       </button>

@@ -15,6 +15,8 @@ export function useAutoSave(
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
+      // Always save if value changed, even if it's empty string
+      // This ensures that clearing the text is saved
       if (value !== previousValueRef.current) {
         startTransition(() => {
           onSave(value);

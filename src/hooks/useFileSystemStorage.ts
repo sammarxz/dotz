@@ -7,6 +7,7 @@ export function useFileSystemStorage() {
   const [isSupported, setIsSupported] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
   const [directoryPath, setDirectoryPath] = useState<string>("");
+  const [directoryDeleted, setDirectoryDeleted] = useState(false);
 
 
   useEffect(() => {
@@ -26,6 +27,15 @@ export function useFileSystemStorage() {
       try {
         const restored = await FileSystemStorage.restoreDirectory();
         if (restored) {
+          // Check if directory is still accessible
+          const isAccessible = await FileSystemStorage.checkDirectoryAccess();
+          if (!isAccessible) {
+            // Directory was deleted
+            setDirectoryDeleted(true);
+            setIsInitialized(true);
+            setNeedsSetup(false);
+            return;
+          }
           // Migrate from individual files to single journal.json if needed
           await FileSystemStorage.migrateFromIndividualFiles();
           setIsInitialized(true);
@@ -70,11 +80,20 @@ export function useFileSystemStorage() {
     }
   }, [isSupported]);
 
+  const clearDirectoryAndUseLocalStorage = useCallback(async () => {
+    await FileSystemStorage.clearDirectoryHandle();
+    setDirectoryDeleted(false);
+    setDirectoryPath("");
+  }, []);
+
   return {
     isInitialized,
     isSupported,
     needsSetup,
     directoryPath,
+    directoryDeleted,
+    setDirectoryDeleted,
     setupFileSystem,
+    clearDirectoryAndUseLocalStorage,
   };
 }

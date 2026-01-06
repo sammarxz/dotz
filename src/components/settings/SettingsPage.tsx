@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Volume2, FolderOpen, RefreshCw, Database, Shield } from "lucide-react";
+import {
+  Bell,
+  Volume2,
+  FolderOpen,
+  RefreshCw,
+  Database,
+  Shield,
+} from "lucide-react";
 
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { ScrollArea } from "@/components/ui/ScrollArea";
@@ -19,21 +26,27 @@ interface SettingsPageProps {
   isOpen: boolean;
   onClose: () => void;
   storageMode?: "localStorage" | "fileSystem";
-  migrateToFileSystem?: () => Promise<{ success: boolean; cancelled?: boolean }>;
+  migrateToFileSystem?: () => Promise<{
+    success: boolean;
+    cancelled?: boolean;
+  }>;
   isSupported?: boolean;
 }
 
-export function SettingsPage({ 
-  isOpen, 
-  onClose, 
+export function SettingsPage({
+  isOpen,
+  onClose,
   storageMode = "localStorage",
   migrateToFileSystem,
-  isSupported: isSupportedProp
+  isSupported: isSupportedProp,
 }: SettingsPageProps) {
   const { settings, updateSettings, enableNotifications } = useSettings();
   const { success, error } = useToast();
-  const { directoryPath, setupFileSystem, isSupported: isSupportedHook } =
-    useFileSystemStorage();
+  const {
+    directoryPath,
+    setupFileSystem,
+    isSupported: isSupportedHook,
+  } = useFileSystemStorage();
   const isSupported = isSupportedProp ?? isSupportedHook;
   const [currentPath, setCurrentPath] = useState<string>("");
   const [isChangingDirectory, setIsChangingDirectory] = useState(false);
@@ -144,7 +157,7 @@ export function SettingsPage({
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
-      <DialogContent className="bg-black border border-zinc-900 text-white max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col m-2 sm:m-4">
+      <DialogContent className="bg-background border border-zinc-900 text-white max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col m-2 sm:m-4">
         {/* Header */}
         <div className="border-b border-zinc-900 px-4 sm:px-8 py-4 sm:py-5">
           <h2 className="text-xl sm:text-2xl font-bold">Settings</h2>
@@ -243,39 +256,42 @@ export function SettingsPage({
                       Storage Location
                     </label>
                     <p className="text-xs text-zinc-500 mt-0.5 break-all">
-                      {storageMode === "fileSystem" 
-                        ? (currentPath || "No directory selected")
+                      {storageMode === "fileSystem"
+                        ? currentPath || "No directory selected"
                         : "Browser Local Storage (temporary)"}
                     </p>
                     {storageMode === "localStorage" && (
                       <p className="text-xs text-zinc-400 mt-1">
-                        Your entries are stored in your browser. Use "Store Safely" to save to your file system.
+                        Your entries are stored in your browser. Use "Store
+                        Safely" to save to your file system.
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="ml-8 mt-2 space-y-2">
-                  {storageMode === "localStorage" && isSupported && migrateToFileSystem && (
-                    <Button
-                      onClick={handleStoreSafely}
-                      disabled={isMigrating}
-                      variant="default"
-                      size="sm"
-                      className="w-full sm:w-auto"
-                    >
-                      {isMigrating ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Storing...
-                        </>
-                      ) : (
-                        <>
-                          <Shield className="w-4 h-4 mr-2" />
-                          Store Safely
-                        </>
-                      )}
-                    </Button>
-                  )}
+                  {storageMode === "localStorage" &&
+                    isSupported &&
+                    migrateToFileSystem && (
+                      <Button
+                        onClick={handleStoreSafely}
+                        disabled={isMigrating}
+                        variant="default"
+                        size="sm"
+                        className="w-full sm:w-auto"
+                      >
+                        {isMigrating ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                            Storing...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="w-4 h-4 mr-2" />
+                            Store Safely
+                          </>
+                        )}
+                      </Button>
+                    )}
                   {storageMode === "fileSystem" && (
                     <Button
                       onClick={handleChangeDirectory}
