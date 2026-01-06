@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import { ToastProvider } from "@/components/ui/Toast";
-import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { ToastProvider } from "@/shared/components/ui/Toast";
+import { ServiceWorkerRegistration } from "@/shared/components/ServiceWorkerRegistration";
 
 import "./globals.css";
 

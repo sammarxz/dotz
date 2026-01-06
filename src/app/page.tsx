@@ -1,14 +1,14 @@
 "use client";
 
-import { DayGrid } from "@/components/journal/DayGrid";
-import { JournalEditor } from "@/components/editor/JournalEditor";
-import { SettingsPage } from "@/components/settings/SettingsPage";
-import { ShortcutsModal } from "@/components/shortcuts/ShortcutsModal";
-import { DirectoryRecoveryModal } from "@/components/storage/DirectoryRecoveryModal";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { DayGrid } from "@/features/journal/components/journal/DayGrid";
+import { JournalEditor } from "@/features/journal/components/editor/JournalEditor";
+import { SettingsPage } from "@/features/settings/components/SettingsPage";
+import { ShortcutsModal } from "@/shared/components/shortcuts/ShortcutsModal";
+import { DirectoryRecoveryModal } from "@/features/journal/components/storage/DirectoryRecoveryModal";
+import { Header } from "@/shared/components/layout/Header";
+import { Footer } from "@/shared/components/layout/Footer";
 
-import { useJournalApp } from "@/hooks/useJournalApp";
+import { useJournalApp } from "@/features/journal/hooks/useJournalApp";
 
 export default function JournalPage() {
   const {
